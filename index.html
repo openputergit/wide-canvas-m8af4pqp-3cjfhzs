@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neubrutalism Loader</title>
+    <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&display=swap');
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            overflow: hidden;
+        }
+
+        .neu-brutal {
+            box-shadow: 8px 8px 0px 0px #000000;
+            border: 3px solid #000000;
+        }
+
+        .curtain {
+            transform: translateY(100%);
+            transition: transform 1s ease-in-out;
+        }
+
+        .curtain.reveal {
+            transform: translateY(-100%);
+        }
+
+        .progress-container {
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .progress-container.slide-left {
+            transform: translateX(-100%);
+        }
+
+        .percentage-display.slide-right {
+            transform: translateX(100%);
+        }
+
+        #backgroundImage {
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .logo {
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+
+        .logo.visible {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-black">
+    <div id="loader" class="h-screen w-screen relative">
+        <div id="backgroundImage" class="absolute top-0 left-0 w-full h-full bg-center bg-cover"></div>
+        
+        <div class="logo absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-6xl font-bold">
+            STUDIO
+        </div>
+
+        <div class="absolute bottom-20 w-full px-8">
+            <div class="progress-container">
+                <div class="bg-white neu-brutal h-8 w-full relative">
+                    <div id="progressBar" class="bg-black h-full" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="percentage-display absolute bottom-8 right-8 bg-white neu-brutal px-6 py-3 text-2xl">
+            <span id="progressNumber">0</span>%
+        </div>
+    </div>
+
+    <div class="curtain absolute top-0 left-0 w-full h-screen bg-black"></div>
+
+    <script>
+        const images = [
+            'https://source.unsplash.com/random/1920x1080?abstract,1',
+            'https://source.unsplash.com/random/1920x1080?abstract,2',
+            'https://source.unsplash.com/random/1920x1080?abstract,3',
+            'https://source.unsplash.com/random/1920x1080?abstract,4',
+            'https://source.unsplash.com/random/1920x1080?abstract,5'
+        ];
+
+        let currentImage = 0;
+        const backgroundEl = document.getElementById('backgroundImage');
+        const progressBar = document.getElementById('progressBar');
+        const progressNumber = document.getElementById('progressNumber');
+        const logo = document.querySelector('.logo');
+        const progressContainer = document.querySelector('.progress-container');
+        const percentageDisplay = document.querySelector('.percentage-display');
+        const curtain = document.querySelector('.curtain');
+
+        function changeBackground() {
+            if (currentImage >= images.length) currentImage = 0;
+            backgroundEl.style.backgroundImage = `url(${images[currentImage]})`;
+            currentImage++;
+        }
+
+        let progress = 0;
+        const interval = setInterval(() => {
+            progress++;
+            progressBar.style.width = `${progress}%`;
+            progressNumber.textContent = progress;
+            
+            if (progress <= 80) {
+                changeBackground();
+            }
+
+            if (progress === 100) {
+                clearInterval(interval);
+                
+                // Slide animations
+                progressContainer.classList.add('slide-left');
+                percentageDisplay.classList.add('slide-right');
+                
+                // Fade in logo
+                setTimeout(() => {
+                    backgroundEl.style.opacity = '0';
+                    logo.classList.add('visible');
+                }, 500);
+
+                // Reveal main content
+                setTimeout(() => {
+                    curtain.classList.add('reveal');
+                }, 2000);
+            }
+        }, 50);
+
+        // Preload images
+        images.forEach(src => {
+            const img = new Image();
+            img.src = src;
+        });
+    </script>
+<script>document.body.addEventListener('wheel', e => { if (!e.ctrlKey) return; e.preventDefault(); return }, { passive: false })</script>
+	</body>
+</html>
